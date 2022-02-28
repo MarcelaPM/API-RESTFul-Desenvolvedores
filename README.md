@@ -1,0 +1,2 @@
+# API-RESTFul-Desenvolvedores
+ API desenvolvida com toda a arquitetura REST (API-RESTFul). Nesta API uma lista de desenvolvedores, identificados por nome, ID e habilidades, pode ser acessada e editada, neste caso segundo suas habilidades. Apenas habilidades cadastradas na lista de habilidades podem ser alteradas na lista de desenvolvedores. Novos desenvolvedores e habilidades podem ser inseridas.  
