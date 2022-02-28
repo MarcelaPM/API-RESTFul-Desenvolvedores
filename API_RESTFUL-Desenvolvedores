@@ -1,0 +1,90 @@
+from flask import Flask, jsonify,request
+import json
+from flask_restful import Resource, Api
+
+app=Flask(__name__)
+api=Api(app)
+
+#Lista dos desenvolvedores atuais
+desenvolvedores = [{'id':0,'nome':'Maria','habilidades':['Python','Flask']},
+{'id':1,'nome':'José','habilidades':['Fortran','SQL']},]
+
+lista_habilidades  =['Python','Java','SQL','Fortran','Flask']
+
+class desenvolvedor(Resource):
+  def get(self, id):
+#Retorna um desenvolvedor, seguno o ID
+    try:
+      response = desenvolvedores[id]
+    except IndexError: 
+      mensagem='Desenvolvedor id {} não existe'.format(id)
+      response={'status': 'erro','mensagem':mensagem}
+    except Exception:
+      mensagem='Erro desconhecido. Procure o admin da API.'
+      response={'status': 'erro','mensagem':mensagem}
+    return(response)
+    
+  def put(self, id):
+#Altera alguma habilidade de um desenvolvedor, segundo o ID. Verifica se a habilidades alterada está na lista atual de habilidades
+    dados=json.loads(request.data)
+    desenvolvedores[id] = dados
+    teste=dados['habilidades']
+    for x in teste:
+      if x in lista_habilidades:
+        return (dados)
+      else:
+        mensagem='Habilidade(s) não cadastrada'
+        response={'mensagem':mensagem,'Lista atual':lista_habilidades}
+        return(response)
+
+         # retorna a alteração para confirmar. Prática comum
+
+  def post(self,id):
+#Insere um novo desenvolvedor
+    dados=json.loads(request.data)
+    posicao=len(desenvolvedores)
+    dados['id']=posicao
+    desenvolvedores.append(dados)
+    print(desenvolvedores)
+    return (desenvolvedores[posicao])
+    
+  def delete(self, id):
+#Deleta algum desenvolvedor
+    desenvolvedores.pop(id)
+    print(desenvolvedores)
+    return({'status':'sucesso','mensagem':'registro excluido'})
+
+class lista_desenvolvedor(Resource):
+ #Lista de todos os desenvolvedores
+  def get(self):
+    return (desenvolvedores)
+
+class habilidades(Resource):
+  def get(self):
+    return(lista_habilidades)
+
+  def post(self):
+#Insere uma nova habilidade
+    dados=json.loads(request.data)
+    #posicao=len(lista_habilidades)
+    lista_habilidades.append(dados)
+    return (lista_habilidades)
+
+class habilidades_alteracoes(Resource):
+  def put(self,idh):
+#Altera um habilidades da lista
+    dados=json.loads(request.data)
+    lista_habilidades[idh]=dados
+    return(lista_habilidades)
+    
+  def delete(self, idh):
+#Deleta alguma habilidade
+    lista_habilidades.pop(idh)
+    return({'status':'sucesso','mensagem':'registro excluido', 'Lista_atual':lista_habilidades})
+
+api.add_resource(desenvolvedor, '/<int:id>')      
+api.add_resource(lista_desenvolvedor, '/')
+api.add_resource(habilidades, '/hab')
+api.add_resource(habilidades_alteracoes, '/hab/<int:idh>')
+
+app.run(host='0.0.0.0')
